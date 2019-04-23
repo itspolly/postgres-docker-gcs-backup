@@ -50,7 +50,7 @@ fi
 
 # Google Cloud Auth
 echo "Authenticating to Google Cloud..."
-echo $GCLOUD_KEYFILE_BASE64 | base64 --decode > /key.json
+echo $GCLOUD_KEYFILE_BASE64 | base64 -d > /key.json
 gcloud auth activate-service-account --key-file /key.json --project "$GCLOUD_PROJECT_ID" -q
 
 
