@@ -25,4 +25,4 @@ More information on the schedule format can be found [here](https://godoc.org/gi
 
 ### Google Cloud Service Account
 
-We reccomend creating a new, write-only service account to the storage bucket you wish to backup to.
+We recommend creating a new, write-only service account to the storage bucket you wish to backup to.
