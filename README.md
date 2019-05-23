@@ -5,6 +5,8 @@ This docker image allows for scheduled backups of a postgres docker container to
 
 ## Usage
 
+This image is published on the [docker hub](https://hub.docker.com/r/nullriver/postgres-docker-gcs-backup).
+
 ### Environment variables
 | Variable                | Description                                                                                                    |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|
@@ -25,4 +27,29 @@ More information on the schedule format can be found [here](https://godoc.org/gi
 
 ### Google Cloud Service Account
 
-We recommend creating a new, write-only service account to the storage bucket you wish to backup to.
+We recommend creating a new, write-only service account to the storage bucket you wish to backup to (with the `storage.objects.list` and `storage.objects.create` permissions).
+
+### Docker Compose
+
+Below is a sample Docker Compose service.
+
+```yaml
+dbbackups:
+    image: "nullriver/postgres-docker-gcs-backup:latest"
+    depends_on:
+      - database
+    networks:
+      - internet
+      - api-internal
+    environment:
+      SCHEDULE: "@every 6h"
+      POSTGRES_HOST: "database"
+      POSTGRES_DATABASE: "SomeDatabase"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      GCLOUD_KEYFILE_BASE64: "BASE64_PROJECT_KEYFILE_HERE"
+      GCLOUD_PROJECT_ID: "hello-world"
+      GCS_BACKUP_BUCKET: "gs://my-backup-bucket-name"
+```
+
+**Note:** the `internet` network exists as `api-internal` is an internal network with no connection to the internet. To enable backing up to the cloud, the service has to be on an external network which can access the internet. `api-internal` is the network which the database is on, so that the `database` hostname resolves to that service.
