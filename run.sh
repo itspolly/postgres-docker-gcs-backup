@@ -9,5 +9,5 @@ if [ "${SCHEDULE}" = "**None**" ]; then
 fi
 
 echo "Performing an immediate backup..."
-exec /bin/sh backup.sh # perform an immediate backup
+sh backup.sh # perform an immediate backup
 exec go-cron "$SCHEDULE" /bin/sh backup.sh
