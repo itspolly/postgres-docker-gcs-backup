@@ -1,0 +1,44 @@
+version: "1.0"
+
+stages:
+  - build
+
+steps:
+  clone:
+    stage: build
+    title: Cloning repository
+    type: git-clone
+    git: github
+    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
+    revision: ${{CF_BRANCH}}
+
+  increment-build-id:
+    stage: build
+    title: Increment build id
+    type: bump-build-number
+
+  version:
+    stage: build
+    title: Setting version (aligned with postgres client) to use as base
+    type: freestyle
+    image: codefresh/cli
+    commands:
+      - cf_export IMAGE_VERSION=13.2
+      - cf_export IMAGE_TAG=13.2.${{CF_BUILD_NUMBER}}
+
+  build:
+    stage: build
+    title: Building Docker image
+    type: build
+    build_arguments:
+      - IMAGE_VERSION=${{IMAGE_VERSION}}
+    image_name: tools/${{CF_REPO_NAME}}
+    tag: ${{IMAGE_TAG}}
+    working_directory: ${{clone}}
+    dockerfile: Dockerfile
+    registry: gcr
+    on_success:
+      annotations:
+        set:
+          - annotations:
+            - docker_image: ${{IMAGE_TAG}}
